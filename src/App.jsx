@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
 import CoinCard from "./components/CoinCard";
+import LimitSelector from "./components/LimitSelector";
 const API_URL = import.meta.env.VITE_API_URL;
-  
 
 const App = () => {
   const [coins, setCoins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [limit, setLimit] = useState(10);
 
   useEffect(() => {
     const fetchCoins = async () => {
       try {
-        const res = await fetch(`${API_URL}?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false`);
+        const res = await fetch(
+          `${API_URL}?vs_currency=usd&order=market_cap_desc&per_page=${limit}&page=1&sparkline=false`
+        );
         if (!res.ok) throw new Error("Failed to fetch data");
         const data = await res.json();
         console.log(data);
@@ -23,13 +26,14 @@ const App = () => {
       }
     };
     fetchCoins();
-  }, []);
+  }, [limit]);
 
   return (
     <div>
       <h1>🚀 Crypto Dash</h1>
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}
+      <LimitSelector limit={limit} onLimitChange={setLimit} />
       {!loading && !error && (
         <main className="grid">
           {coins.map((coin) => (
